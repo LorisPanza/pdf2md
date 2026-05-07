@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Obsidian Converter</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📄 PDF to Obsidian</h1>
+            <p class="subtitle">Convert PDFs to markdown with GLM-OCR</p>
+            <div class="health-status" id="health-status">
+                <span class="status-indicator" id="status-indicator">●</span>
+                <span id="status-text">Checking...</span>
+            </div>
+        </header>
+
+        <main>
+            <!-- Upload Section -->
+            <section id="upload-section" class="section">
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-icon">📎</div>
+                    <h2>Drop PDF here or click to upload</h2>
+                    <p>Maximum file size: 50MB</p>
+                    <input type="file" id="file-input" accept=".pdf" hidden>
+                </div>
+                <div class="file-info" id="file-info" style="display: none;">
+                    <span id="filename"></span>
+                    <span id="filesize"></span>
+                </div>
+            </section>
+
+            <!-- Processing Section -->
+            <section id="processing-section" class="section" style="display: none;">
+                <h2>Processing...</h2>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <p class="progress-message" id="progress-message">Starting...</p>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results-section" class="section" style="display: none;">
+                <h2>Results</h2>
+
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="preview">Preview</button>
+                    <button class="tab-button" data-tab="editor">Edit Markdown</button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- Preview Tab -->
+                    <div id="preview-tab" class="tab-pane active">
+                        <div class="markdown-preview" id="markdown-preview"></div>
+                    </div>
+
+                    <!-- Editor Tab -->
+                    <div id="editor-tab" class="tab-pane">
+                        <textarea id="markdown-editor" class="markdown-editor"></textarea>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button id="save-btn" class="btn btn-primary">💾 Save to Outputs</button>
+                    <button id="new-btn" class="btn btn-secondary">🔄 Convert Another</button>
+                </div>
+
+                <div class="save-success" id="save-success" style="display: none;">
+                    ✓ Saved successfully!
+                </div>
+            </section>
+
+            <!-- Error Section -->
+            <section id="error-section" class="section error-section" style="display: none;">
+                <h2>❌ Error</h2>
+                <p id="error-message"></p>
+                <button id="retry-btn" class="btn btn-secondary">🔄 Try Again</button>
+            </section>
+        </main>
+
+        <footer>
+            <p>Powered by <a href="https://github.com/zai-org/GLM-OCR" target="_blank">GLM-OCR</a> •
+               Running on <a href="https://ollama.com/" target="_blank">Ollama</a></p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

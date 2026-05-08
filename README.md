@@ -1,165 +1,197 @@
-# PDF to Obsidian Converter
+<div align="center">
 
-Convert PDFs (articles, scanned documents) to Obsidian-friendly markdown using state-of-the-art GLM-OCR.
+# 📄✨ PDF to Obsidian
 
-## Features
+**Transform your PDFs into beautiful Obsidian notes with AI-powered OCR**
 
-- 🚀 **State-of-the-art OCR** - Uses GLM-OCR (ranks #1 on OmniDocBench)
-- 📝 **Live preview** - See results with rendered markdown preview
-- ✏️ **Edit before saving** - Fix OCR errors before committing to your vault
-- 🖼️ **Image extraction** - Saves images separately with Obsidian `![[image.png]]` links
-- 🏠 **100% Local** - Runs on localhost via Ollama, no cloud dependencies
+[![Made with Python](https://img.shields.io/badge/Made%20with-Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Powered by Ollama](https://img.shields.io/badge/Powered%20by-Ollama-000000?style=for-the-badge)](https://ollama.com)
+[![GLM-OCR](https://img.shields.io/badge/GLM--OCR-Rank%20%231-FF6B6B?style=for-the-badge)](https://github.com/zai-org/GLM-OCR)
 
-## Quick Start
+*Stop retyping. Start researching.*
 
-### 1. Prerequisites
+</div>
 
-- **Conda** (recommended) - [Install Miniconda](https://docs.conda.io/en/latest/miniconda.html)
-- **Ollama** - [Install Ollama](https://ollama.com/)
+---
 
-### 2. Setup (One-time)
+## 🎯 What is This?
+
+A **localhost web app** that converts PDFs (papers, articles, scanned docs) into **clean Obsidian markdown** using state-of-the-art AI OCR.
+
+- 🚀 **Best-in-class OCR** - GLM-OCR ranks #1 on OmniDocBench
+- 🏠 **100% Local** - No cloud, no API keys, runs on your machine
+- ⚡ **Live Preview** - See markdown as it processes, edit before saving
+- 🎨 **Dark Theme** - Beautiful interface with real-time progress
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+1. **[Ollama](https://ollama.com)** - Download and install
+2. **[Conda](https://docs.conda.io/en/latest/miniconda.html)** - Recommended for Windows
+
+### Setup
 
 ```bash
-# Pull the GLM-OCR model
+# 1. Pull the GLM-OCR model
 ollama pull glm-ocr
 
-# Create conda environment
-setup_conda.bat    # Windows CMD
-# OR
-bash setup_conda.sh    # Git Bash/Linux
+# 2. Create conda environment
+conda env create -f environment.yml
 ```
 
-### 3. Run
+### Run
 
 ```bash
-# Start Ollama (in a separate terminal - keep it running)
+# Terminal 1: Start Ollama (keep running)
 ollama serve
 
-# Start the app
-start_app.bat    # Easy way
-# OR
+# Terminal 2: Start the app
 conda activate pdf2md
 python -m uvicorn backend.app.main:app --reload
+
+# Or use the launcher (Windows)
+start_app.bat
 ```
 
-### 4. Use
+**Open browser:** http://localhost:8000
 
-1. Open browser: http://localhost:8000
-2. Drag and drop a PDF file
-3. Wait for processing (progress shown in real-time)
-4. Review and edit the markdown
-5. Click "💾 Save to Outputs"
-6. Copy from `outputs/` folder to your Obsidian vault
+## 🎬 How It Works
 
-## Project Structure
+1. **Drop your PDF** into the web interface
+2. **Watch live progress** as GLM-OCR processes each page
+3. **Review the markdown** in the preview tab
+4. **Edit if needed** to fix any OCR errors
+5. **Save to outputs/** folder
+6. **Copy to your Obsidian vault** - done!
+
+## 📁 Project Structure
 
 ```
 pdf_to_md_obsidian/
-├── backend/app/           # FastAPI backend
-│   ├── main.py           # Server with WebSocket support
+├── backend/app/           # FastAPI server
+│   ├── main.py           # Routes + WebSocket
 │   ├── processor.py      # GLM-OCR integration
-│   ├── config.py         # App configuration
-│   └── config.yaml       # GLM-OCR Ollama settings
-├── frontend/             # Vanilla JS frontend
-│   ├── index.html       # UI
-│   ├── styles.css       # Dark theme
-│   └── app.js           # Client logic
-├── uploads/             # Temporary PDF storage
-├── outputs/             # Processed markdown files
-├── environment.yml      # Conda environment (recommended)
-├── requirements.txt     # Pip dependencies (alternative)
-├── setup_conda.bat/.sh  # One-time setup scripts
-└── start_app.bat        # Quick start script
+│   ├── config.py         # App settings
+│   └── config.yaml       # Ollama configuration
+├── frontend/             # Vanilla JS UI
+│   ├── index.html       # Dark theme interface
+│   ├── app.js           # WebSocket client
+│   └── styles.css       # Styling
+├── uploads/             # Temporary PDFs
+├── outputs/             # Your markdown files
+├── environment.yml      # Conda environment
+└── start_app.bat        # Quick launcher (Windows)
 ```
 
-## Configuration
+## 🔧 Configuration
 
-Edit `backend/app/config.py` to customize:
-- Upload/output folder locations
-- GLM-OCR settings
-- Server host/port
-- File size limits
+### App Settings (`backend/app/config.py`)
 
-The `backend/app/config.yaml` configures GLM-OCR to use Ollama:
-- Disables cloud API (MaaS)
-- Points to local Ollama (localhost:11434)
-- Uses CPU for layout detection
+```python
+max_file_size = 50 * 1024 * 1024  # 50MB limit
+upload_dir = "uploads"
+output_dir = "outputs"
+```
 
-## Troubleshooting
+### GLM-OCR Settings (`backend/app/config.yaml`)
 
-### "Ollama not running"
-- Make sure Ollama is running: `ollama serve`
-- Verify glm-ocr model: `ollama list`
-- Check Ollama is on port 11434: `curl http://localhost:11434/api/tags`
+```yaml
+pipeline:
+  maas:
+    enabled: false  # Use local Ollama
+  ocr_api:
+    api_host: localhost
+    api_port: 11434
+    api_mode: openai  # OpenAI-compatible endpoint
+    model: glm-ocr
+  layout:
+    device: cpu  # or cuda if you have GPU
+```
 
-### "PDF too large"
-- Current limit: 50MB
-- Try splitting PDF or reducing quality
-- Adjust `max_file_size` in `backend/app/config.py`
+## 🔧 Troubleshooting
 
-### "Processing is slow"
-- First run loads models (slow)
-- Subsequent runs are faster
-- Large PDFs take longer
-- Layout detection uses CPU (configurable)
-
-### Environment Issues
-- **Windows DLL errors**: Use Conda instead of pip
-- **Python 3.11+ issues**: Use Python 3.10 (Conda handles this)
-- **Import errors**: Run `setup_conda.bat` again
-
-## Alternative Setup (Without Conda)
-
-If you don't have Conda, you can use pip (requires Python 3.10):
+<details>
+<summary><b>🔴 "Ollama not running"</b></summary>
 
 ```bash
-# Create virtual environment
-python -m venv .venv
-source .venv/Scripts/activate  # Windows Git Bash
-# OR
-.venv\Scripts\activate.bat     # Windows CMD
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Start Ollama (separate terminal)
+# Start Ollama
 ollama serve
 
-# Run app
+# Verify it's running
+curl http://localhost:11434/api/tags
+
+# Check model is installed
+ollama list
+```
+</details>
+
+<details>
+<summary><b>🟡 "Processing failed"</b></summary>
+
+Restart the app - the pipeline needs to start fresh:
+```bash
+# Press Ctrl+C, then restart
+python -m uvicorn backend.app.main:app --reload
+```
+</details>
+
+<details>
+<summary><b>🔵 Windows PyTorch DLL errors</b></summary>
+
+**Solution:** Use Conda (not pip)
+```bash
+conda env create -f environment.yml
+```
+Conda handles PyTorch dependencies correctly on Windows.
+</details>
+
+<details>
+<summary><b>🟢 Slow processing</b></summary>
+
+- **First run**: Model loading is slow (~30 seconds)
+- **Subsequent runs**: Much faster
+- **GPU**: Change `device: cuda` in `config.yaml`
+</details>
+
+## 💡 Tips
+
+- Start with small PDFs (1-5 pages) to test
+- Always review before saving - OCR isn't perfect
+- Keep Ollama running for best performance
+- First conversion is slower (loads models)
+
+## 🛠️ Alternative Setup (pip)
+
+Without Conda? Use pip (requires Python 3.10):
+
+```bash
+python -m venv .venv
+source .venv/Scripts/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
 python -m uvicorn backend.app.main:app --reload
 ```
 
-**Note**: Pip may have PyTorch DLL issues on Windows. Conda is recommended.
+⚠️ May have PyTorch DLL issues on Windows - Conda recommended.
 
-## Development
+## 📊 Tech Stack
 
-Based on the architecture documented in `C:\Users\loris\Documents\obisidian\Designing\projects\pdf-to-obsidian\`.
+- **Backend:** Python 3.10, FastAPI, WebSockets
+- **OCR:** GLM-OCR via Ollama
+- **Frontend:** Vanilla HTML/CSS/JS
+- **Layout Detection:** PaddleOCR PP-DocLayout V3
 
-### Tech Stack
-- **Backend**: Python 3.10, FastAPI, GLM-OCR SDK
-- **Frontend**: HTML/CSS/JavaScript (no build tools)
-- **OCR**: GLM-OCR via Ollama
-- **UI**: Dark theme, WebSocket real-time updates
+## 🙏 Acknowledgments
 
-### Key Components
-- `main.py` - FastAPI routes and WebSocket handling
-- `processor.py` - PDF processing with GLM-OCR
-- `app.js` - Frontend logic and WebSocket client
-- `config.yaml` - GLM-OCR Ollama configuration
+- [GLM-OCR](https://github.com/zai-org/GLM-OCR) - State-of-the-art OCR
+- [Ollama](https://ollama.com/) - Local LLM deployment
+- [FastAPI](https://fastapi.tiangolo.com/) - Web framework
+- [Obsidian](https://obsidian.md/) - Note-taking app
 
-## Tips
+---
 
-- Start with small PDFs (1-5 pages) to test
-- Review and edit output before saving
-- Keep Ollama running for best performance
-- First conversion is slower (loads models)
-- Images are detected but manual handling needed (future feature)
+<div align="center">
 
-## License
+**Made with ❤️ for the Obsidian community**
 
-TBD - Open source
-
-## Acknowledgments
-
-- [GLM-OCR](https://github.com/zai-org/GLM-OCR) - State-of-the-art OCR model
-- [Ollama](https://ollama.com/) - Local model deployment
+</div>

@@ -14,12 +14,12 @@ pipeline:
     api_host: localhost
     api_port: 11434  # Ollama default port
     api_scheme: http
-    api_path: /api/generate  # Ollama native endpoint
+    api_path: /v1/chat/completions  # OpenAI-compatible endpoint (Ollama supports this)
     api_url: null  # Let it construct from above
 
     # Model and mode
     model: glm-ocr  # Must match: ollama list
-    api_mode: ollama_generate  # Use Ollama's native /api/generate format
+    api_mode: openai  # Use OpenAI-compatible format (better for vision)
 
     # Authentication (not needed for local Ollama)
     api_key: null

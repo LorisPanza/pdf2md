@@ -34,9 +34,22 @@ class PDFProcessor:
     async def initialize(self):
         """Initialize the GLM-OCR parser"""
         try:
-            # Initialize parser with config
-            self.parser = GlmOcr(layout_device=settings.layout_device)
-            logger.info("GLM-OCR parser initialized successfully")
+            # Load config from YAML file to use local Ollama instead of MaaS
+            from glmocr.config import load_config
+
+            config_path = Path(__file__).parent / "config.yaml"
+            config = load_config(str(config_path))
+
+            logger.info(f"Loaded config from {config_path}, MaaS enabled: {config.pipeline.maas.enabled}")
+
+            # Initialize parser with selfhosted mode explicitly
+            # This prevents MaaS client initialization
+            self.parser = GlmOcr(
+                mode="selfhosted",  # Explicitly use selfhosted mode
+                layout_device=settings.layout_device,
+                config_model=config
+            )
+            logger.info("GLM-OCR parser initialized successfully with local Ollama (selfhosted mode)")
         except Exception as e:
             logger.error(f"Failed to initialize GLM-OCR parser: {e}")
             raise

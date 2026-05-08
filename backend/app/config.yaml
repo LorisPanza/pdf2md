@@ -1,11 +1,91 @@
+# GLM-OCR Configuration for Ollama
+#
+# This config disables MaaS (cloud API) and uses local Ollama
+
+# Pipeline settings
 pipeline:
+  # Disable MaaS (cloud API) - REQUIRED for local Ollama
   maas:
     enabled: false
+
+  # OCR API client configuration for Ollama
   ocr_api:
+    # Connection settings
     api_host: localhost
-    api_port: 11434
-    api_path: /api/generate  # Use Ollama native endpoint
-    model: glm-ocr:latest    # Required: specify model name
-    api_mode: ollama_generate  # Required: use Ollama native format
+    api_port: 11434  # Ollama default port
+    api_scheme: http
+    api_path: /api/generate  # Ollama native endpoint
+    api_url: null  # Let it construct from above
+
+    # Model and mode
+    model: glm-ocr  # Must match: ollama list
+    api_mode: ollama_generate  # Use Ollama's native /api/generate format
+
+    # Authentication (not needed for local Ollama)
+    api_key: null
+    headers: {}
+
+    # SSL/TLS
+    verify_ssl: false
+
+    # Timeouts (in seconds)
+    connect_timeout: 30
+    request_timeout: 120
+
+    # Retry settings
+    retry_max_attempts: 2
+    retry_backoff_base_seconds: 0.5
+    retry_backoff_max_seconds: 8.0
+    retry_jitter_ratio: 0.2
+    retry_status_codes: [429, 500, 502, 503, 504]
+
+    # Connection pool
+    connection_pool_size: 128
+
+  # Maximum parallel workers for region recognition
+  max_workers: 32
+
+  # Queue sizes
+  page_maxsize: 100
+  region_maxsize: 2000
+
+  # Page loader settings
+  page_loader:
+    # Generation parameters
+    max_tokens: 8192
+    temperature: 0.0
+    top_p: 0.00001
+    top_k: 1
+    repetition_penalty: 1.1
+
+    # Image processing
+    t_patch_size: 2
+    patch_expand_factor: 1
+    image_expect_length: 6144
+    image_format: JPEG
+    min_pixels: 12544
+    max_pixels: 71372800
+
+    # PDF processing
+    pdf_dpi: 200
+    pdf_max_pages: null
+    pdf_verbose: false
+
+  # Result formatter
+  result_formatter:
+    output_format: both  # json and markdown
+    enable_merge_formula_numbers: true
+    enable_merge_text_blocks: true
+    enable_format_bullet_points: true
+
+  # Layout detection settings
   layout:
+    model_dir: PaddlePaddle/PP-DocLayoutV3_safetensors
+    threshold: 0.3
+    batch_size: 1
+    workers: 1
+    cuda_visible_devices: "0"
+    device: cpu  # Force CPU for layout (save GPU for OCR)
     use_polygon: false
+    layout_nms: true
+    layout_unclip_ratio: [1.0, 1.0]

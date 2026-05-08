@@ -1,6 +1,7 @@
 """PDF processing using GLM-OCR"""
 import asyncio
 import logging
+import os
 from pathlib import Path
 from typing import Optional, Callable
 from dataclasses import dataclass
@@ -34,22 +35,31 @@ class PDFProcessor:
     async def initialize(self):
         """Initialize the GLM-OCR parser"""
         try:
-            # Load config from YAML file to use local Ollama instead of MaaS
-            from glmocr.config import load_config
-
+            # Get config path
             config_path = Path(__file__).parent / "config.yaml"
+
+            # Load config for verification
+            from glmocr.config import load_config
             config = load_config(str(config_path))
 
-            logger.info(f"Loaded config from {config_path}, MaaS enabled: {config.pipeline.maas.enabled}")
+            # Debug logging
+            logger.info(f"Loading config from: {config_path}")
+            logger.info(f"MaaS enabled: {config.pipeline.maas.enabled}")
+            logger.info(f"OCR API host: {config.pipeline.ocr_api.api_host}")
+            logger.info(f"OCR API port: {config.pipeline.ocr_api.api_port}")
+            logger.info(f"OCR API path: {config.pipeline.ocr_api.api_path}")
+            logger.info(f"OCR API mode: {config.pipeline.ocr_api.api_mode}")
+            logger.info(f"OCR model: {config.pipeline.ocr_api.model}")
 
-            # Initialize parser with selfhosted mode explicitly
-            # This prevents MaaS client initialization
+            # Initialize parser with config_path parameter
             self.parser = GlmOcr(
-                mode="selfhosted",  # Explicitly use selfhosted mode
-                layout_device=settings.layout_device,
-                config_model=config
+                config_path=str(config_path),
+                layout_device=settings.layout_device
             )
-            logger.info("GLM-OCR parser initialized successfully with local Ollama (selfhosted mode)")
+
+            # Start the pipeline (important: keeps it alive for all requests)
+            self.parser.__enter__()
+            logger.info("GLM-OCR parser initialized and pipeline started successfully")
         except Exception as e:
             logger.error(f"Failed to initialize GLM-OCR parser: {e}")
             raise
@@ -160,14 +170,18 @@ class PDFProcessor:
 
     def _process_sync(self, pdf_path: str):
         """Synchronous processing wrapper for GLM-OCR"""
-        with self.parser:
-            return self.parser.parse(pdf_path)
+        # Pipeline is already started in initialize(), just call parse
+        return self.parser.parse(pdf_path)
 
     async def cleanup(self):
         """Cleanup resources"""
         if self.parser:
-            # GLM-OCR cleanup if needed
-            pass
+            try:
+                # Stop the pipeline on shutdown
+                self.parser.__exit__(None, None, None)
+                logger.info("GLM-OCR pipeline stopped")
+            except Exception as e:
+                logger.error(f"Error during cleanup: {e}")
 
 
 # Global processor instance

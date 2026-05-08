@@ -6,7 +6,7 @@ __pycache__/
 .Python
 env/
 venv/
-.venv
+.venv/
 ENV/
 build/
 dist/
@@ -27,3 +27,9 @@ outputs/*
 # OS
 .DS_Store
 Thumbs.db
+
+# Conda
+.conda/
+
+# Logs
+*.log

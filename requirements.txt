@@ -1,8 +1,21 @@
+# PDF to Obsidian Converter - Dependencies
+#
+# RECOMMENDED: Use Conda (see environment.yml and README.md)
+#   conda env create -f environment.yml
+#
+# This file is for pip users only (requires Python 3.10)
+# Note: PyTorch may have DLL issues with pip on Windows
+
+# Web framework
 fastapi==0.115.0
 uvicorn[standard]==0.32.0
 python-multipart==0.0.12
 websockets==13.1
-glmocr>=0.1.0
 aiofiles==24.1.0
+
+# Configuration
 pydantic>=2.12.0
 pydantic-settings==2.6.0
+
+# OCR (includes PyTorch dependencies)
+glmocr[selfhosted]>=0.1.0

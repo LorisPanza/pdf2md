@@ -36,3 +36,6 @@ Thumbs.db
 
 #agent
 .claude
+
+# Windows batch files
+*.bat

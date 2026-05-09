@@ -49,9 +49,6 @@ ollama serve
 # Terminal 2: Start the app
 conda activate pdf2md
 python -m uvicorn backend.app.main:app --reload
-
-# Or use the launcher (Windows)
-start_app.bat
 ```
 
 **Open browser:** http://localhost:8000
@@ -80,8 +77,7 @@ pdf_to_md_obsidian/
 │   └── styles.css       # Styling
 ├── uploads/             # Temporary PDFs
 ├── outputs/             # Your markdown files
-├── environment.yml      # Conda environment
-└── start_app.bat        # Quick launcher (Windows)
+└── environment.yml      # Conda environment
 ```
 
 ## 🔧 Configuration

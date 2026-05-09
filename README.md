@@ -1,8 +1,8 @@
 <div align="center">
 
-# 📄✨ PDF to Obsidian
+# 📄✨ PDF to Markdown
 
-**Transform your PDFs into beautiful Obsidian notes with AI-powered OCR**
+**Transform your PDFs into clean Markdown with AI-powered OCR**
 
 [![Made with Python](https://img.shields.io/badge/Made%20with-Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Powered by Ollama](https://img.shields.io/badge/Powered%20by-Ollama-000000?style=for-the-badge)](https://ollama.com)
@@ -16,7 +16,7 @@
 
 ## 🎯 What is This?
 
-A **localhost web app** that converts PDFs (papers, articles, scanned docs) into **clean Obsidian markdown** using state-of-the-art AI OCR.
+A **localhost web app** that converts PDFs (papers, articles, scanned docs) into **clean Markdown** using state-of-the-art AI OCR. Perfect for note-taking apps like Obsidian, or any workflow that needs Markdown.
 
 - 🚀 **Best-in-class OCR** - GLM-OCR ranks #1 on OmniDocBench
 - 🏠 **100% Local** - No cloud, no API keys, runs on your machine
@@ -60,7 +60,7 @@ python -m uvicorn backend.app.main:app --reload
 3. **Review the markdown** in the preview tab
 4. **Edit if needed** to fix any OCR errors
 5. **Save to outputs/** folder
-6. **Copy to your Obsidian vault** - done!
+6. **Use anywhere** - copy to Obsidian, Notion, or any Markdown-compatible app!
 
 ## 📁 Project Structure
 
@@ -182,12 +182,11 @@ python -m uvicorn backend.app.main:app --reload
 - [GLM-OCR](https://github.com/zai-org/GLM-OCR) - State-of-the-art OCR
 - [Ollama](https://ollama.com/) - Local LLM deployment
 - [FastAPI](https://fastapi.tiangolo.com/) - Web framework
-- [Obsidian](https://obsidian.md/) - Note-taking app
 
 ---
 
 <div align="center">
 
-**Made with ❤️ for the Obsidian community**
+**Made with ❤️ for the Markdown community**
 
 </div>

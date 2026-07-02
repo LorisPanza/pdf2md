@@ -26,11 +26,39 @@ class ProcessingResult:
             self.images = []
 
 
+# How long Ollama should keep the OCR model resident in memory between requests,
+# so each page doesn't pay the cold-load cost again.
+OLLAMA_KEEP_ALIVE = "30m"
+
+
 class PDFProcessor:
     """Handles PDF processing with GLM-OCR"""
 
     def __init__(self):
         self.parser = None
+        self.ocr_model = self._load_model_name()
+
+    def _load_model_name(self) -> str:
+        """Read the configured OCR model name from config.yaml (no network needed)"""
+        from glmocr.config import load_config
+        config_path = Path(__file__).parent / "config.yaml"
+        config = load_config(str(config_path))
+        return config.pipeline.ocr_api.model
+
+    async def _prewarm_model(self):
+        """
+        Force Ollama to load the model weights into memory before the pipeline's
+        own warm-up call. A cold model load can take longer than the pipeline's
+        connect_timeout, causing initialization to fail with a spurious timeout.
+        """
+        import httpx
+        url = f"http://{settings.ocr_api_host}:{settings.ocr_api_port}/api/generate"
+        async with httpx.AsyncClient() as client:
+            await client.post(
+                url,
+                json={"model": self.ocr_model, "keep_alive": OLLAMA_KEEP_ALIVE},
+                timeout=150.0
+            )
 
     async def initialize(self):
         """Initialize the GLM-OCR parser"""
@@ -51,6 +79,12 @@ class PDFProcessor:
             logger.info(f"OCR API mode: {config.pipeline.ocr_api.api_mode}")
             logger.info(f"OCR model: {config.pipeline.ocr_api.model}")
 
+            # Preload the model into Ollama's memory so the pipeline's warm-up
+            # call below doesn't race a cold model load against its own timeout
+            logger.info(f"Pre-warming Ollama model '{self.ocr_model}'...")
+            await self._prewarm_model()
+            logger.info("Model pre-warmed successfully")
+
             # Initialize parser with config_path parameter
             self.parser = GlmOcr(
                 config_path=str(config_path),
@@ -65,7 +99,7 @@ class PDFProcessor:
             raise
 
     async def check_ollama_health(self) -> bool:
-        """Check if Ollama is running and accessible"""
+        """Check if Ollama is running and the configured OCR model is pulled"""
         try:
             import httpx
             async with httpx.AsyncClient() as client:
@@ -73,7 +107,12 @@ class PDFProcessor:
                     f"http://{settings.ocr_api_host}:{settings.ocr_api_port}/api/tags",
                     timeout=5.0
                 )
-                return response.status_code == 200
+                if response.status_code != 200:
+                    return False
+                models = response.json().get("models", [])
+                # Ollama tags include the version, e.g. "glm-ocr:latest"
+                model_names = {m.get("name", "").split(":")[0] for m in models}
+                return self.ocr_model.split(":")[0] in model_names
         except Exception as e:
             logger.error(f"Ollama health check failed: {e}")
             return False
@@ -101,7 +140,14 @@ class PDFProcessor:
             if not await self.check_ollama_health():
                 return ProcessingResult(
                     success=False,
-                    error="Ollama service is not running. Please start Ollama with 'ollama serve'"
+                    error=f"Ollama is not running or model '{self.ocr_model}' is not pulled. "
+                          f"Run 'ollama serve' and 'ollama pull {self.ocr_model}'"
+                )
+
+            if self.parser is None:
+                return ProcessingResult(
+                    success=False,
+                    error="OCR parser failed to initialize. Check server logs and restart the server."
                 )
 
             # Validate file exists

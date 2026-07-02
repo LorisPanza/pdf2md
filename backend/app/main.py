@@ -56,8 +56,8 @@ async def startup_event():
         await processor.initialize()
         logger.info("Application started successfully")
     except Exception as e:
-        logger.error(f"Failed to start application: {e}")
-        raise
+        logger.warning(f"Startup initialization failed (Ollama may not be running): {e}")
+        logger.warning("Server will start in degraded mode — start Ollama and pull glm-ocr to enable processing")
 
 
 @app.on_event("shutdown")

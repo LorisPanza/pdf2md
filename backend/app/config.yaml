@@ -29,8 +29,8 @@ pipeline:
     verify_ssl: false
 
     # Timeouts (in seconds)
-    connect_timeout: 30
-    request_timeout: 120
+    connect_timeout: 60
+    request_timeout: 180
 
     # Retry settings
     retry_max_attempts: 2

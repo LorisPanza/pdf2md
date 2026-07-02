@@ -23,6 +23,10 @@ A **localhost web app** that converts PDFs (papers, articles, scanned docs) into
 - ⚡ **Live Preview** - See markdown as it processes, edit before saving
 - 🎨 **Dark Theme** - Beautiful interface with real-time progress
 
+## 🎥 Demo
+
+![Demo](docs/Animazione.gif)
+
 ## 🚀 Quick Start
 
 ### Prerequisites
